@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BienvenidaMail;
 
 class RegisterController extends Controller
 {
@@ -27,11 +29,24 @@ class RegisterController extends Controller
             'nombre' => $request->nombre,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'rol' => 'cliente', // El rol predeterminado es cliente para evitar problemas de inicio de sesion
+            'rol' => 'client', // El rol predeterminado es cliente para evitar problemas de inicio de sesion
         ]);
 
-        Auth::login($usuario);
+        // Verificar que el usuario se haya creado correctamente antes de enviar el correo
+        if ($usuario && $usuario->email) {
+            try {
+                Mail::to($usuario->email)->send(new BienvenidaMail($usuario));
+            } catch (\Exception $e) {
+                // Registrar el error pero continuar con el proceso
+                \Log::error('Error al enviar correo de bienvenida: ' . $e->getMessage());
+            }
+        }
 
-        return redirect('inicio');
+        // Autenticar al usuario si se creó correctamente
+        if ($usuario) {
+            Auth::login($usuario);
+        }
+
+        return redirect('/');
     }
 }

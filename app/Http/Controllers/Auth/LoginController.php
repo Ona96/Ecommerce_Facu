@@ -24,12 +24,14 @@ class LoginController extends Controller
         if (Auth::attempt($credenciales)) {
             $request->session()->regenerate();
 
-            $usuario = Usuario::where('email', $credenciales['email'])->first();
+            $usuario = Auth::user();
             
+            //dd($usuario->rol); //para ver que carajos da como rol
+
             if ($usuario->rol === 'admin') {
-                return redirect()->intended('admin/dashboard');
+                return redirect()->route('admin.dashboard');
             } else {
-                return redirect()->intended('inicio');
+                return redirect()->route('inicio');
             }
         }
 

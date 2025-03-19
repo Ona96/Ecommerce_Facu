@@ -15,6 +15,7 @@ class Orden extends Model
         'usuario_id',
         'monto_total',
         'estado',
+        'direccion_envio',
     ];
 
     public function usuario()

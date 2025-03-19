@@ -11,17 +11,22 @@ use App\Models\Usuario;
 class DashboardController extends Controller
 {
     public function index()
-    {
-        $totalOrdenes = Orden::count();
-        $totalProductos = Producto::count();
-        $totalUsuarios = Usuario::where('rol', 'cliente')->count();
-        $ordenesRecientes = Orden::with('usuario')->orderBy('created_at', 'desc')->take(5)->get();
-        
-        return view('admin.dashboard', compact(
-            'totalOrdenes', 
-            'totalProductos', 
-            'totalUsuarios', 
-            'ordenesRecientes'
-        ));
-    }
+{
+    $totalOrdenes = Orden::count();
+    $totalProductos = Producto::count();
+    $totalUsuarios = Usuario::where('rol', 'client')->count();
+    
+    $ordenesRecientes = Orden::with('usuario')
+        ->whereHas('usuario') // Solo los forros con cuenta aparecen
+        ->orderBy('created_at', 'desc')
+        ->take(5)
+        ->get();
+    
+    return view('admin.dashboard', compact(
+        'totalOrdenes', 
+        'totalProductos', 
+        'totalUsuarios', 
+        'ordenesRecientes'
+    ));
+}
 }

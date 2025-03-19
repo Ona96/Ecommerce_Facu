@@ -6,9 +6,10 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\OrdenController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductoController as AdminProductoController;
 use App\Http\Controllers\Admin\OrdenController as AdminOrdenController;
+use App\Http\Controllers\Admin\PerfilController; // Agregar esta importación
 
 // Rutas públicas
 Route::get('/', [ProductoController::class, 'destacados'])->name('inicio');
@@ -23,7 +24,7 @@ Route::get('/registro', [RegisterController::class, 'mostrarFormularioRegistro']
 Route::post('/registro', [RegisterController::class, 'registrar']);
 
 // Rutas protegidas
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
     // Rutas del carrito
     Route::get('/carrito', [CarritoController::class, 'index'])->name('carrito.index');
     Route::post('/carrito/agregar', [CarritoController::class, 'agregar'])->name('carrito.agregar');
@@ -38,8 +39,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checkout', [OrdenController::class, 'guardar'])->name('ordenes.guardar');
     
     // Rutas de administración
-    Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::middleware(\App\Http\Middleware\CheckAdmin::class)->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         
         // Rutas de productos para admin
         Route::get('/productos', [AdminProductoController::class, 'index'])->name('productos.index');
@@ -53,5 +54,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/ordenes', [AdminOrdenController::class, 'index'])->name('ordenes.index');
         Route::get('/ordenes/{id}', [AdminOrdenController::class, 'mostrar'])->name('ordenes.mostrar');
         Route::put('/ordenes/{id}/estado', [AdminOrdenController::class, 'actualizarEstado'])->name('ordenes.estado');
+        Route::get('/ordenes/{id}/editar', [AdminOrdenController::class, 'editar'])->name('ordenes.editar');
+        Route::put('/ordenes/{id}', [AdminOrdenController::class, 'actualizar'])->name('ordenes.actualizar');
+        Route::delete('/ordenes/{id}', [AdminOrdenController::class, 'eliminar'])->name('ordenes.eliminar');
+        
+        // Rutas para cambio de contraseña (agregar estas rutas)
+        Route::get('/perfil/cambiar-password', [PerfilController::class, 'editarPassword'])->name('perfil.password');
+        Route::put('/perfil/cambiar-password', [PerfilController::class, 'actualizarPassword'])->name('perfil.actualizar-password');
     });
 });

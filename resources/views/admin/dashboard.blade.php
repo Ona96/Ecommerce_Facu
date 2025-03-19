@@ -81,7 +81,7 @@
                             <div class="text-sm text-gray-900">${{ number_format($orden->monto_total, 2) }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $orden->status === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $orden->estado === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800' }}">
                                 {{ $orden->estado === 'pendiente' ? 'Pendiente' : 'Enviado' }}
                             </span>
                         </td>
@@ -95,29 +95,23 @@
             </tbody>
         </table>
     </div>
-    
-    <div class="p-4 border-t">
-        <a href="{{ route('admin.ordenes.index') }}" class="text-blue-500 hover:text-blue-600">
-            Ver todos los pedidos
-        </a>
-    </div>
 </div>
 
 <div class="flex justify-between mb-6">
     <h2 class="text-lg font-semibold">Acciones Rápidas</h2>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <a href="{{ route('admin.productos.crear') }}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-200">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <a href="{{ route('admin.productos.index') }}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-200">
         <div class="flex items-center">
             <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                 </svg>
             </div>
             <div>
-                <p class="font-semibold">Agregar Nuevo Producto</p>
-                <p class="text-sm text-gray-500">Crear un nuevo producto en el catálogo</p>
+                <p class="font-semibold">Gestionar Productos</p>
+                <p class="text-sm text-gray-500">Ver, agregar, editar y eliminar productos</p>
             </div>
         </div>
     </a>
@@ -132,6 +126,20 @@
             <div>
                 <p class="font-semibold">Gestionar Pedidos</p>
                 <p class="text-sm text-gray-500">Ver y actualizar el estado de los pedidos</p>
+            </div>
+        </div>
+    </a>
+    
+    <a href="{{ route('admin.perfil.password') }}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-200">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-red-100 text-red-500 mr-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </div>
+            <div>
+                <p class="font-semibold">Cambiar Contraseña</p>
+                <p class="text-sm text-gray-500">Actualiza tu contraseña de administrador</p>
             </div>
         </div>
     </a>

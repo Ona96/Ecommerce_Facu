@@ -25,17 +25,36 @@ class OrdenController extends Controller
         return view('admin.ordenes.mostrar', compact('orden'));
     }
     
-    public function actualizarEstado(Request $request, $id)
+    public function editar($id)
+    {
+        $orden = Orden::with(['usuario', 'items.producto'])
+            ->findOrFail($id);
+            
+        return view('admin.ordenes.editar', compact('orden'));
+    }
+    
+    public function actualizar(Request $request, $id)
     {
         $request->validate([
             'estado' => 'required|in:pendiente,enviado',
+            'direccion_envio' => 'required|string|max:255',
         ]);
         
         $orden = Orden::findOrFail($id);
-        $orden->status = $request->status;
+        $orden->estado = $request->estado;
+        $orden->direccion_envio = $request->direccion_envio;
         $orden->save();
         
         return redirect()->route('admin.ordenes.mostrar', $id)
-            ->with('exito', 'Estado de la orden actualizado.');
+            ->with('exito', 'Orden actualizada exitosamente.');
+    }
+
+    public function eliminar($id)
+    {
+        $orden = Orden::findOrFail($id);
+        $orden->delete();
+        
+        return redirect()->route('admin.ordenes.index')
+            ->with('exito', 'Orden eliminada exitosamente.');
     }
 }

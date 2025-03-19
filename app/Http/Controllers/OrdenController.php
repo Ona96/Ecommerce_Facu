@@ -66,15 +66,19 @@ class OrdenController extends Controller
             return $item->cantidad * $item->producto->precio;
         });
         
+
+        $montoTotal = $total >= 50000 ? $total : $total + 5000;
+        
         DB::beginTransaction();
         
         try {
-            // Crear orden
-            $orden = Orden::create([
-                'usuario_id' => Auth::id(),
-                'monto_total' => $total,
-                'estado' => 'pendiente',
-            ]);
+            // Crear orden usando un método en español
+            $orden = new Orden();
+            $orden->usuario_id = Auth::id();
+            $orden->monto_total = $montoTotal;
+            $orden->estado = 'pendiente';
+            $orden->direccion_envio = $request->direccion_envio;
+            $orden->save();
             
             // Crear items de la orden
             foreach ($itemsCarrito as $item) {
@@ -97,7 +101,7 @@ class OrdenController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             
-            return redirect()->back()->with('error', 'Ocurrió un error al procesar tu orden.');
+            return redirect()->back()->with('error', 'Ocurrió un error al procesar tu orden: ' . $e->getMessage());
         }
     }
 }

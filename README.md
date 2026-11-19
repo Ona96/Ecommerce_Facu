@@ -1,66 +1,106 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Venecia Modas — E-commerce en Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Laravel](https://img.shields.io/badge/Laravel_12-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP_8.2-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
+[![Blade](https://img.shields.io/badge/Blade-f56b57?style=flat-square)](https://laravel.com/docs/blade)
 
-## About Laravel
+Proyecto académico de la carrera de Análisis de Sistemas: tienda online de indumentaria («Venecia Modas») con catálogo, carrito persistido en base de datos, checkout, historial de pedidos y panel de administración con control de acceso por rol.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+La consigna que me impuse fue hacerlo **sin paquetes de terceros**: ni Breeze/Jetstream para autenticación, ni librerías de carrito, ni carts en sesión. Autenticación, carrito, órdenes y guardas del panel están implementados a mano sobre Laravel 12, para entender cada pieza.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Características
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Catálogo**: home con hasta 8 productos destacados, listado paginado (12 por página) y ficha de cada producto.
+- **Carrito persistido en la base** por usuario autenticado: agregar, cambiar cantidades, quitar ítems o vaciar, con subtotales y total calculados.
+- **Checkout** con dirección de envío y regla de envío: **compras de $50.000 o más tienen envío gratis; debajo de eso se suman $5.000**.
+- **Órdenes con precio congelado**: cada ítem guarda el precio unitario del momento de la compra, dentro de una transacción de base de datos; el carrito se vacía al confirmar.
+- **Historial de pedidos** del cliente con detalle y estado (`pendiente` / `enviado`).
+- **Login y registro** con verificación de credenciales y **email de bienvenida** (manejo de errores con log; por defecto `MAIL_MAILER=log`).
+- **Panel admin** (`/admin`): dashboard con totales (órdenes, productos, clientes), CRUD de productos con imagen, gestión de órdenes (editar estado y dirección, eliminar) y cambio de contraseña del propio admin.
+- **Roles y acceso**: `admin` y `client` en la tabla `usuarios`; el grupo de rutas `/admin/*` está protegido por el middleware `CheckAdmin` (redirige a inicio si no sos admin). El registro público siempre crea clientes.
 
-## Learning Laravel
+## Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Capa | Tecnología |
+|---|---|
+| Backend | Laravel 12.2 · PHP 8.2 · Eloquent |
+| Frontend | Blade + **Tailwind CSS y Alpine.js por CDN** (el andamiaje Vite del skeleton quedó sin uso: las vistas no compilan assets) |
+| Base de datos | SQLite por defecto (MySQL listo para activar en `.env`) |
+| Mail | Mailable `BienvenidaMail` con vista HTML propia |
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Modelo de datos
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Tabla | Contenido |
+|---|---|
+| `usuarios` | clientes y admins (`nombre`, `email`, `password`, `rol`) — el guard de Laravel autentica contra esta tabla |
+| `productos` | nombre, descripción, precio, imagen (binaria) y `destacado` |
+| `carrito_items` | un registro por producto en el carrito de cada usuario |
+| `ordenes` | total, estado (`pendiente`/`enviado`), dirección de envío |
+| `orden_items` | ítems con precio unitario congelado al momento de la compra |
 
-## Laravel Sponsors
+> Nota: la tabla `users` del skeleton de Laravel convive sin uso; el sistema real usa `usuarios`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Puesta en marcha
 
-### Premium Partners
+Requisitos: PHP 8.2+, Composer. No hace falta instalar nada de npm: los assets se cargan por CDN.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan serve
+# http://localhost:8000
+```
 
-## Contributing
+Por defecto usa SQLite (`database/database.sqlite`; crealo vacío si no existe). Para MySQL, descomentá el bloque `DB_*` de `.env.example` con tus credenciales.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Crear el primer admin
 
-## Code of Conduct
+El seeder no crea usuarios del sistema (es un proyecto con datos propios), así que el primer admin se crea a mano:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan tinker
+```
 
-## Security Vulnerabilities
+```php
+App\Models\Usuario::create([
+    'nombre'   => 'Admin',
+    'email'    => 'admin@ejemplo.com',
+    'password' => bcrypt('elegi-una-clave-segura'),
+    'rol'      => 'admin',
+]);
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Después podés cargar productos desde `/admin/productos`. En `resources/fotosdeprueba/` hay 10 imágenes de prueba listas para subir.
 
-## License
+## Rutas principales
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Área | Rutas |
+|---|---|
+| Pública | `/` (destacados) · `/productos` · `/productos/{id}` · `/login` · `/registro` |
+| Cliente (`auth`) | `/carrito` (+ agregar/actualizar/eliminar/vaciar) · `/checkout` · `/ordenes` |
+| Admin (`auth` + `CheckAdmin`) | `/admin/dashboard` · `/admin/productos` (CRUD) · `/admin/ordenes` · `/admin/perfil/cambiar-password` |
+
+## Alcance y limitaciones (honesto)
+
+Es un proyecto de aprendizaje y su alcance es el de la consigna. **No incluye**: pasarela de pagos (no hay ninguna integración ni simulación), control de stock, búsqueda o categorías/filtros, cupones ni reviews. Los tests son los de ejemplo del framework. Algunas decisiones son didácticas y no idiomáticas a propósito, como guardar las imágenes de producto como binario en la base y renderizarlas en base64, o la validación inline en controladores en lugar de Form Requests.
+
+## Estructura
+
+```
+app/
+├─ Http/
+│  ├─ Controllers/          # Producto, Carrito, Orden + Auth/ (login, registro)
+│  │                        #   + Admin/ (dashboard, productos, ordenes, perfil)
+│  └─ Middleware/           # CheckAdmin: guarda del panel
+├─ Mail/BienvenidaMail.php
+└─ Models/                  # Usuario, Producto, CarritoItem, Orden, OrdenItem
+database/migrations/        # 7 migraciones (usuarios, productos, carrito, ordenes)
+resources/views/            # 18 vistas Blade: tienda, auth, carrito, ordenes, admin, email
+routes/web.php              # todas las rutas de la app
+```
+
+---
+
+*Proyecto académico de Kevin Otto ([@Ona96](https://github.com/Ona96)) para la carrera de Análisis de Sistemas.*
